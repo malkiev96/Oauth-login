@@ -1,0 +1,6 @@
+.idea
+auth-server/target
+client-app/target
+resource-server/target
+target
+*.iml
