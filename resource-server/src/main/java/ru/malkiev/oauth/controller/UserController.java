@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 @RestController
-public class MyController {
+public class UserController {
 
-    @GetMapping("/api/principal")
-    public Principal principal(Principal principal){
-        return principal;
+    @GetMapping("/api/username")
+    public String username(Principal principal){
+        return principal.getName();
     }
 }

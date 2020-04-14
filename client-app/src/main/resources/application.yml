@@ -1,5 +1,5 @@
 server:
-  port: 80
+  port: 8080
 
 zuul:
   sensitiveHeaders: Cookie,Set-Cookie
@@ -25,8 +25,9 @@ security:
       clientSecret: secret
       accessTokenUri: http://localhost:8081/auth/oauth/token
       userAuthorizationUri: http://localhost:8081/auth/oauth/authorize
+      scope: profile
     resource:
-      userInfoUri: http://localhost:8081/auth/user/me
+      userInfoUri: http://localhost:8081/auth/users/me
 
 spring:
   thymeleaf:

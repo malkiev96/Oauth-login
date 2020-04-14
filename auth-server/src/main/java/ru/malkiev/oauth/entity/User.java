@@ -1,14 +1,18 @@
 package ru.malkiev.oauth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-@Entity(name = "users")
+@Entity
+@Table(name = "USER")
 @Data
+@EqualsAndHashCode(of = {"id", "username"})
 public class User implements UserDetails {
 
     @Id
@@ -21,12 +25,27 @@ public class User implements UserDetails {
 
     private String password;
 
-    @ManyToMany(cascade = CascadeType.PERSIST,fetch = FetchType.EAGER)
-    @JoinTable
-    private List<Role> roles;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinTable(
+            name = "User_roles",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id")}
+    )
+    private Set<Role> roles = new HashSet<>();
+
+    public void addRole(Role role) {
+        roles.add(role);
+        role.getUsers().add(this);
+    }
+
+    public void removeRole(Role role) {
+        roles.remove(role);
+        role.getUsers().remove(this);
+    }
 
     @Override
-    public List<Role> getAuthorities() {
+    @JsonIgnore
+    public Set<Role> getAuthorities() {
         return roles;
     }
 
@@ -49,4 +68,5 @@ public class User implements UserDetails {
     public boolean isCredentialsNonExpired() {
         return enabled;
     }
+
 }
