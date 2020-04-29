@@ -5,11 +5,12 @@ zuul:
   sensitiveHeaders: Cookie,Set-Cookie
   routes:
     auth:
-      path: /oauth/**
-      url: http://localhost:8081
+      path: /auth/**
+      url: http://localhost:8081/auth
     resource:
       path: /api/**
       url: http://localhost:8082/api
+  add-proxy-headers: true
 
 logging:
   level:
@@ -18,19 +19,36 @@ logging:
     org.springframework.security: INFO
     org.springframework.security.oauth2: INFO
 
-security:
-  oauth2:
-    client:
-      clientId: client
-      clientSecret: secret
-      accessTokenUri: http://localhost:8081/auth/oauth/token
-      userAuthorizationUri: http://localhost:8081/auth/oauth/authorize
-      scope: profile
-    resource:
-      userInfoUri: http://localhost:8081/auth/users/me
-
 spring:
   thymeleaf:
     cache: false
   main:
     allow-bean-definition-overriding: true
+  security:
+    oauth2:
+      client:
+        registration:
+          sso:
+            clientId: client
+            clientSecret: secret
+            redirectUri: http://localhost:8080/login/oauth2/code/sso
+            scope: profile
+            authorization-grant-type: authorization_code
+            provider: sso
+          github:
+            clientId: 874abe0c163d45ef41d6
+            clientSecret: 776065bdadbf99ba834efdfd3053c9c8a8651c4c
+            redirectUri: http://localhost:8080/login/oauth2/code/github
+            authorization-grant-type: authorization_code
+            provider: github
+        provider:
+          sso:
+            tokenUri: http://localhost:8081/auth/oauth/token
+            authorizationUri: http://localhost:8081/auth/oauth/authorize
+            userInfoUri: http://localhost:8081/auth/user/me
+            userNameAttribute: name
+          github:
+            tokenUri: https://github.com/login/oauth/access_token
+            authorizationUri: https://github.com/login/oauth/authorize
+            userInfoUri: https://api.github.com/user
+            userNameAttribute: name
