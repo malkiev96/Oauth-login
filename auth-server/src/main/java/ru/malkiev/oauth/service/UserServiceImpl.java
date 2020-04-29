@@ -47,14 +47,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User save(User user) {
-        Set<Role> roles = new HashSet<>(user.getRoles());
-        user.setRoles(new HashSet<>());
-        //Cascade Merge
-        //очищаем set roles у юзера, затем добавляем роли, если она есть в базе
-        //иначе TransientObjectException
-        for (Role role: roles){
-            roleRepository.findRoleByName(role.getName()).ifPresent(user::addRole);
-        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setEnabled(true);
         return userRepository.save(user);
@@ -67,15 +59,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(long id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            //Удаляем все связанные роли
-            for (Role role : roleRepository.findAll()) {
-                user.removeRole(role);
-            }
-            save(user);
-            userRepository.deleteById(id);
-        }
+        userRepository.deleteById(id);
     }
 }

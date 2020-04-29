@@ -33,26 +33,25 @@ public class UserInit implements ApplicationRunner {
         Role roleAdmin = new Role();
         roleAdmin.setName("ROLE_ADMIN");
 
-        roleRepository.save(roleUser);
-        roleRepository.save(roleAdmin);
+        roleUser = roleRepository.save(roleUser);
+        roleAdmin = roleRepository.save(roleAdmin);
 
         User admin = new User();
         admin.setEnabled(true);
         admin.setUsername("admin");
         admin.setPassword("admin");
 
-        admin.addRole(roleUser);
-        admin.addRole(roleAdmin);
+        admin.setRoles(roleRepository.findAll());
 
         User user = new User();
         user.setEnabled(true);
         user.setUsername("user");
         user.setPassword("user");
 
-        user.addRole(roleUser);
+        user.setRoles(Collections.singletonList(roleUser));
 
-        user = userService.save(user);
-        admin = userService.save(admin);
+        userService.save(user);
+        userService.save(admin);
 
         log.info(userService.getAllUsers());
         log.info(roleRepository.findAll());

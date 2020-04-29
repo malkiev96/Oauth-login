@@ -1,12 +1,12 @@
 package ru.malkiev.oauth.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "ROLE")
@@ -20,9 +20,9 @@ public class Role implements GrantedAuthority {
 
 	private String name;
 
-	@ManyToMany(mappedBy = "roles", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	@ManyToMany(mappedBy = "roles", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	@JsonIgnore
-	private Set<User> users = new HashSet<>();
+	private List<User> users;
 
 	@Override
 	@JsonIgnore
@@ -32,9 +32,6 @@ public class Role implements GrantedAuthority {
 
 	@Override
 	public String toString() {
-		return "Role{" +
-				"id=" + id +
-				", name='" + name + '\'' +
-				'}';
+		return name;
 	}
 }

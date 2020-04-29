@@ -6,8 +6,7 @@ import lombok.EqualsAndHashCode;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "USER")
@@ -25,27 +24,17 @@ public class User implements UserDetails {
 
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "User_roles",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")}
     )
-    private Set<Role> roles = new HashSet<>();
-
-    public void addRole(Role role) {
-        roles.add(role);
-        role.getUsers().add(this);
-    }
-
-    public void removeRole(Role role) {
-        roles.remove(role);
-        role.getUsers().remove(this);
-    }
+    private List<Role> roles;
 
     @Override
     @JsonIgnore
-    public Set<Role> getAuthorities() {
+    public List<Role> getAuthorities() {
         return roles;
     }
 
@@ -55,16 +44,19 @@ public class User implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return enabled;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return enabled;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return enabled;
     }
