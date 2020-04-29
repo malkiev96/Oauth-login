@@ -9,18 +9,18 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "ROLE")
+@Table
 @Data
 @EqualsAndHashCode(of = {"id", "name"})
 public class Role implements GrantedAuthority {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue
 	private Long id;
 
 	private String name;
 
-	@ManyToMany(mappedBy = "roles", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "role")
 	@JsonIgnore
 	private List<User> users;
 

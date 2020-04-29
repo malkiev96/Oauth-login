@@ -6,10 +6,11 @@ import lombok.EqualsAndHashCode;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
-@Table(name = "USER")
+@Table
 @Data
 @EqualsAndHashCode(of = {"id", "username"})
 public class User implements UserDetails {
@@ -24,18 +25,14 @@ public class User implements UserDetails {
 
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "User_roles",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")}
-    )
-    private List<Role> roles;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private Role role;
 
     @Override
     @JsonIgnore
     public List<Role> getAuthorities() {
-        return roles;
+        return Collections.singletonList(role);
     }
 
     @Override

@@ -15,6 +15,7 @@ import ru.malkiev.oauth.assembler.UserModelAssembler;
 import ru.malkiev.oauth.entity.Role;
 import ru.malkiev.oauth.entity.User;
 import ru.malkiev.oauth.repository.RoleRepository;
+import ru.malkiev.oauth.service.RoleService;
 import ru.malkiev.oauth.service.UserService;
 
 import java.security.Principal;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
-    private final RoleRepository roleRepository;
+    private final RoleService roleService;
     private final UserModelAssembler userModelAssembler;
 
     @GetMapping("/user/me")
@@ -56,25 +57,25 @@ public class UserController {
 
     @GetMapping("/users/role/{id}")
     public CollectionModel<EntityModel<User>> getAllByRoleId(@PathVariable long id) {
-        Role role = roleRepository.findById(id)
+        Role role = roleService.getRoleById(id)
                 .orElseThrow(() -> new RoleNotFoundException(id));
         return userModelAssembler.toCollectionModel(role.getUsers());
     }
 
     @GetMapping("/users/search")
-    public CollectionModel<EntityModel<User>> searchByUsername(@RequestParam(value = "username", required = true) String username,
-                                                               @RequestParam(value = "roleName", defaultValue = "", required = false) String roleName) {
+    public CollectionModel<EntityModel<User>> searchByUsername(@RequestParam(value = "username") String username,
+                                                               @RequestParam(value = "roleName") String roleName) {
         List<User> users = userService.searchUserByUsername(username);
 
         if (roleName.isEmpty()) {
             return userModelAssembler.toCollectionModel(users);
         }
 
-        Role role = roleRepository.findRoleByName(roleName)
+        Role role = roleService.getRoleByName(roleName)
                 .orElseThrow(() -> new RoleNotFoundException(roleName));
 
         List<User> usersWithRole = users.stream()
-                .filter(user -> user.getRoles().contains(role))
+                .filter(user -> user.getRole().equals(role))
                 .collect(Collectors.toList());
 
         return userModelAssembler.toCollectionModel(usersWithRole);
@@ -83,9 +84,9 @@ public class UserController {
 
     @PostMapping("/users")
     public ResponseEntity<?> addUser(@RequestBody User user, UriComponentsBuilder uriComponentsBuilder) {
-        if (user.getUsername().isEmpty() &&
-                user.getPassword().isEmpty() &&
-                user.getRoles().isEmpty()) {
+        if (user.getUsername().isEmpty() ||
+                user.getPassword().isEmpty() ||
+                user.getRole()==null) {
             return ResponseEntity.badRequest().body(user);
         }
         user = userService.save(user);
@@ -101,7 +102,7 @@ public class UserController {
         User updatedUser = userService.getUserById(id)
                 .map(user -> {
                     user.setPassword(newUser.getPassword());
-                    user.setRoles(newUser.getRoles());
+                    user.setRole(newUser.getRole());
                     return userService.save(user);
                 }).orElseThrow(() -> new UserNotFoundException(id));
 

@@ -41,14 +41,14 @@ public class UserInit implements ApplicationRunner {
         admin.setUsername("admin");
         admin.setPassword("admin");
 
-        admin.setRoles(roleRepository.findAll());
+        admin.setRole(roleAdmin);
 
         User user = new User();
         user.setEnabled(true);
         user.setUsername("user");
         user.setPassword("user");
 
-        user.setRoles(Collections.singletonList(roleUser));
+        user.setRole(roleUser);
 
         userService.save(user);
         userService.save(admin);

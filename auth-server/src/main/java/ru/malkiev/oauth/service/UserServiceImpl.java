@@ -17,7 +17,7 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getUsersByRoleName(String name) {
-        Optional<Role> role = roleRepository.findRoleByName(name);
+        Optional<Role> role = roleService.getRoleByName(name);
 
         return role.isPresent()
                 ? new ArrayList<>(role.get().getUsers())
