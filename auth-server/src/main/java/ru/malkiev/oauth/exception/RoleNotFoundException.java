@@ -1,12 +1,14 @@
 package ru.malkiev.oauth.exception;
 
+import ru.malkiev.oauth.entity.Role;
+
 public class RoleNotFoundException extends RuntimeException {
 
     public RoleNotFoundException(long id) {
-        super("Role not found with id: " + id);
+        super("Role not found by id: " + id);
     }
 
-    public RoleNotFoundException(String name) {
-        super("Role not found with name: " + name);
+    public RoleNotFoundException(Role.Code code) {
+        super("Role not found by code: " + code);
     }
 }

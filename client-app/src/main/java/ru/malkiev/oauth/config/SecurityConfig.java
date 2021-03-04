@@ -2,6 +2,7 @@ package ru.malkiev.oauth.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
@@ -16,6 +17,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/login/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
-				.oauth2Login();
+				.oauth2Login(Customizer.withDefaults())
+				.logout(Customizer.withDefaults());
 	}
 }

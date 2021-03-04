@@ -11,5 +11,5 @@ logging:
 security:
   oauth2:
     resource:
-      userInfoUri: http://localhost:8081/auth/users/me
+      userInfoUri: http://localhost:8081/auth/user/me
       prefer-token-info: false

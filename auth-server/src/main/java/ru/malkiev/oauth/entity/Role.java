@@ -1,37 +1,43 @@
 package ru.malkiev.oauth.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
-@Entity
-@Table
 @Data
-@EqualsAndHashCode(of = {"id", "name"})
+@Entity
+@Table(name = "AUTH_ROLE")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Role implements GrantedAuthority {
 
-	@Id
-	@GeneratedValue
-	private Long id;
+    @Id
+    @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	private String name;
+    @Column(name = "CODE", nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    @NotNull
+    @JsonIgnore
+    private Code code;
 
-	@OneToMany(mappedBy = "role")
-	@JsonIgnore
-	private List<User> users;
+    @Column(name = "NAME", nullable = false)
+    @NotNull
+    private String name;
 
-	@Override
-	@JsonIgnore
-	public String getAuthority() {
-		return name;
-	}
+    @Override
+    public String getAuthority() {
+        return code.name();
+    }
 
-	@Override
-	public String toString() {
-		return name;
-	}
+    public enum Code {
+        ROLE_USER,
+        ROLE_ADMIN
+    }
 }

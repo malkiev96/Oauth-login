@@ -11,6 +11,7 @@ public class ResourceConfig extends ResourceServerConfigurerAdapter {
 
     private static final String RESOURCE_ID = "auth_server";
 
+    @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
         resources.resourceId(RESOURCE_ID).stateless(false);
     }

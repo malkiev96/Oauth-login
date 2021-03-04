@@ -1,12 +1,8 @@
 package ru.malkiev.oauth.config;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -20,7 +16,6 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 import ru.malkiev.oauth.service.UserService;
 
 import javax.servlet.Filter;
-import javax.sql.DataSource;
 
 @Configuration
 @EnableAuthorizationServer
