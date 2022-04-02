@@ -1,13 +1,16 @@
 package ru.malkiev.oauth.repository;
 
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
 import ru.malkiev.oauth.entity.User;
 
-import java.util.Optional;
-
-@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findUserByUsername(String username);
+  @Query(value = "select u from User u left join fetch u.roles where upper(u.username) = upper(?1) ")
+  Optional<User> findByUsername(String username);
+
+  @Query(value = "select u from User u left join fetch u.roles where upper(u.email) = upper(?1) ")
+  Optional<User> findByEmail(String email);
+
 }

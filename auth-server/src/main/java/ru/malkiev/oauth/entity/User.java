@@ -1,81 +1,71 @@
 package ru.malkiev.oauth.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import javax.persistence.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Collections;
-import java.util.List;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@Table(name = "AUTH_USER")
 @NoArgsConstructor
-@AllArgsConstructor
-public class User implements UserDetails {
+@Table(name = "AUTH_USER")
+public class User {
 
-    @Id
-    @Column(name = "ID")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @Column(name = "ID")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "USERNAME", nullable = false, unique = true)
-    @NotNull
-    @Size(min = 3, max = 32)
-    private String username;
+  @Column(name = "USERNAME", nullable = false, unique = true)
+  @NotNull
+  @Size(min = 3, max = 32)
+  private String username;
 
-    @Column(name = "DISPLAY_NAME", nullable = false)
-    @NotNull
-    @Size(min = 3, max = 64)
-    private String displayName;
+  @Column(name = "FIRSTNAME", nullable = false)
+  @NotNull
+  @Size(min = 1, max = 128)
+  private String firstName;
 
-    @Column(name = "PASSWORD", nullable = false)
-    @NotNull
-    @JsonIgnore
-    private String password;
+  @Column(name = "LASTNAME", nullable = false)
+  @NotNull
+  @Size(min = 1, max = 128)
+  private String lastname;
 
-    @Column(name = "EMAIL", nullable = false, unique = true)
-    @NotNull
-    @Email
-    private String email;
+  @Column(name = "PASSWORD", nullable = false)
+  @NotNull
+  @JsonIgnore
+  private String password;
 
-    @Column(name = "ENABLED", nullable = false)
-    private boolean enabled;
+  @Column(name = "EMAIL", nullable = false, unique = true)
+  @NotNull
+  @Email
+  private String email;
 
-    @ManyToOne
-    @JoinColumn(name = "ROLE_ID", nullable = false)
-    @NotNull
-    private Role role;
+  @Column(name = "ENABLED_FLG", nullable = false)
+  private boolean enabled;
 
-    @Override
-    public List<Role> getAuthorities() {
-        return Collections.singletonList(role);
-    }
+  @Column(name = "LOCKED_FLG", nullable = false)
+  private boolean locked;
 
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return enabled;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return enabled;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return enabled;
-    }
+  @ManyToMany
+  @JoinTable(
+      name = "AUTH_USER_ROLES",
+      joinColumns = @JoinColumn(name = "USER_ID"),
+      inverseJoinColumns = @JoinColumn(name = "ROLE_ID")
+  )
+  private Set<Role> roles = new LinkedHashSet<>();
 
 }
