@@ -1,14 +1,11 @@
 package ru.malkiev.oauth.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.List;
+import org.springframework.data.repository.CrudRepository;
 import ru.malkiev.oauth.entity.Role;
 
-import java.util.Optional;
+public interface RoleRepository extends CrudRepository<Role, Long> {
 
-@Repository
-public interface RoleRepository extends JpaRepository<Role, Long> {
-
-    Optional<Role> findRoleByCode(Role.Code code);
+  List<Role> findAllByDefaultRole(Boolean defaultRole);
 
 }

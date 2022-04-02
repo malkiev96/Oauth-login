@@ -1,17 +1,6 @@
 server:
   port: 8080
 
-zuul:
-  sensitiveHeaders: Cookie,Set-Cookie
-  routes:
-    auth:
-      path: /auth/**
-      url: http://localhost:8081/auth
-    resource:
-      path: /api/**
-      url: http://localhost:8082/api
-  add-proxy-headers: true
-
 logging:
   level:
     root: INFO
@@ -20,24 +9,26 @@ logging:
     org.springframework.security.oauth2: INFO
 
 spring:
-  thymeleaf:
-    cache: false
-  main:
-    allow-bean-definition-overriding: true
   security:
     oauth2:
       client:
         registration:
-          sso:
-            clientId: client
-            clientSecret: secret
-            redirectUri: http://localhost:8080/login/oauth2/code/sso
-            scope: profile
+          articles-client-oidc:
+            provider: spring
+            client-id: articles-client
+            client-secret: secret
             authorization-grant-type: authorization_code
-            provider: sso
+            redirect-uri: "http://127.0.0.1:8080/login/oauth2/code/{registrationId}"
+            scope: openid
+            client-name: articles-client-oidc
+          articles-client-authorization-code:
+            provider: spring
+            client-id: articles-client
+            client-secret: secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "http://127.0.0.1:8080/authorized"
+            scope: articles.read
+            client-name: articles-client-authorization-code
         provider:
-          sso:
-            tokenUri: http://localhost:8081/auth/oauth/token
-            authorizationUri: http://localhost:8081/auth/oauth/authorize
-            userInfoUri: http://localhost:8081/auth/user/me
-            userNameAttribute: name
+          spring:
+            issuer-uri: http://auth-server:9000

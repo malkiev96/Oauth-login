@@ -1,10 +1,11 @@
 package ru.malkiev.oauth.service;
 
+import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import ru.malkiev.oauth.entity.User;
+import ru.malkiev.oauth.dto.UserDto;
 
-public interface UserService extends UserDetailsService {
+public interface UserService extends UserDetailsService, UserDetailsPasswordService {
 
-    User create(User user);
+  void createUser(UserDto dto) throws IllegalArgumentException;
 
 }

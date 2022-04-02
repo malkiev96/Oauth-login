@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8090
 
 logging:
   level:
@@ -8,8 +8,9 @@ logging:
     org.springframework.security: INFO
     org.springframework.security.oauth2: INFO
 
-security:
-  oauth2:
-    resource:
-      userInfoUri: http://localhost:8081/auth/user/me
-      prefer-token-info: false
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://auth-server:9000
