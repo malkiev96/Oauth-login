@@ -56,15 +56,13 @@ public class AuthorizationServerConfig {
   @Bean
   public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
     RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-        .clientId("articles-client")
-        .clientSecret(passwordEncoder.encode("secret"))
+        .clientId("auth-client")
+        .clientSecret(passwordEncoder.encode("auth-secret"))
         .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
         .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-        .redirectUri("http://127.0.0.1:8080/login/oauth2/code/articles-client-oidc")
-        .redirectUri("http://127.0.0.1:8080/authorized")
+        .redirectUri("http://127.0.0.1:8080/login/oauth2/code/auth-client-oidc")
         .scope(OidcScopes.OPENID)
-        .scope("articles.read")
         .build();
     RegisteredClientRepository clientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
     clientRepository.save(registeredClient);
