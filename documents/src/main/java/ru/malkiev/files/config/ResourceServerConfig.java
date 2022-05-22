@@ -1,4 +1,4 @@
-package ru.malkiev.oauth.config;
+package ru.malkiev.files.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,8 +10,9 @@ public class ResourceServerConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.authorizeRequests().anyRequest().authenticated()
+    http.authorizeRequests().anyRequest().permitAll()
         .and()
+        .cors().and().csrf().disable()
         .oauth2ResourceServer()
         .jwt();
     return http.build();
