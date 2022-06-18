@@ -1,5 +1,6 @@
 package ru.malkiev.documents.entity;
 
+import java.time.ZonedDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,6 +31,9 @@ public class Document implements Persistable<Long> {
 
   @Column(name = "DOCUMENT_TYPE")
   private String documentType;
+
+  @Column(name = "CREATED_DATE_TIME", nullable = false)
+  private ZonedDateTime createdDateTime;
 
   @Override
   public boolean isNew() {

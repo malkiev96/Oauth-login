@@ -3,11 +3,14 @@ package ru.malkiev.documents.service;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,10 +23,12 @@ import ru.malkiev.documents.repository.DocumentRepository;
 @AllArgsConstructor
 public class DocumentService {
 
+  private final CurrentUser currentUser;
   private final FileStorageService storageService;
   private final DocumentRepository repository;
 
-  public Document save(Long userId, MultipartFile file) {
+  public Document save(MultipartFile file) {
+    Long userId = currentUser.getUserId();
     Objects.requireNonNull(file.getOriginalFilename(), "file name can't be null");
     String fileName = StringUtils.cleanPath(file.getOriginalFilename());
     String randomFolder = UUID.randomUUID().toString();
@@ -34,6 +39,7 @@ public class DocumentService {
     document.setDocumentType(file.getContentType());
     document.setFilePath(pathToFile.toString());
     document.setFileName(fileName);
+    document.setCreatedDateTime(ZonedDateTime.now());
 
     return repository.save(document);
   }
@@ -41,6 +47,10 @@ public class DocumentService {
   public Document getById(Long documentId) {
     return repository.findById(documentId)
         .orElseThrow(() -> new DocumentNotFoundException(documentId));
+  }
+
+  public List<Document> getDocumentsByUserId(Long userId, Sort sort) {
+    return repository.findAllByUserId(userId, sort);
   }
 
   public Resource loadAsResource(Long documentId) {

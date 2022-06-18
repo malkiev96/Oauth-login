@@ -1,8 +1,12 @@
 package ru.malkiev.documents.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.malkiev.documents.entity.Document;
 import ru.malkiev.documents.model.DocumentResponse;
-import ru.malkiev.documents.service.CurrentUser;
 import ru.malkiev.documents.service.DocumentService;
 
 @Slf4j
@@ -23,12 +26,11 @@ import ru.malkiev.documents.service.DocumentService;
 @RequestMapping("/documents")
 public class DocumentController {
 
-  private final CurrentUser currentUser;
   private final DocumentService service;
 
   @PostMapping
   public ResponseEntity<DocumentResponse> save(@RequestParam("file") MultipartFile file) {
-    Document document = service.save(currentUser.getUserId(), file);
+    Document document = service.save(file);
     return ResponseEntity.ok(DocumentResponse.of(document));
   }
 
@@ -41,10 +43,21 @@ public class DocumentController {
         .body(resource);
   }
 
-  @GetMapping("/{id}/info")
+  @GetMapping("/{id}")
   public ResponseEntity<DocumentResponse> documentInfo(@PathVariable Long id) {
     return ResponseEntity.ok(
         DocumentResponse.of(service.getById(id))
+    );
+  }
+
+  @GetMapping("/user/{userId}")
+  public ResponseEntity<List<DocumentResponse>> userDocuments(
+      @PathVariable Long userId,
+      @SortDefault("createdDateTime") Sort sort) {
+    return ResponseEntity.ok(
+        service.getDocumentsByUserId(userId, sort).stream()
+            .map(DocumentResponse::of)
+            .collect(Collectors.toList())
     );
   }
 
