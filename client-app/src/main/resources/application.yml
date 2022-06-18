@@ -9,6 +9,19 @@ logging:
     org.springframework.security.oauth2: INFO
 
 spring:
+  cloud:
+    gateway:
+      default-filters:
+        - RemoveResponseHeader=Cookie,Set-Cookie
+        - StripPrefix=1
+        - TokenRelay=
+      routes:
+        - id: documents
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/documents/**
+  main:
+    allow-bean-definition-overriding: true
   security:
     oauth2:
       client:

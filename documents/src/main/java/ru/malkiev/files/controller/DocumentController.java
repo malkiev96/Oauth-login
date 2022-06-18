@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import ru.malkiev.files.entity.Document;
 import ru.malkiev.files.model.DocumentResponse;
 import ru.malkiev.files.service.DocumentService;
@@ -24,7 +25,7 @@ public class DocumentController {
   private final DocumentService service;
 
   @PostMapping
-  public ResponseEntity<DocumentResponse> save(z@RequestParam("file") MultipartFile file) {
+  public ResponseEntity<DocumentResponse> save(@RequestParam("file") MultipartFile file) {
     Document document = service.save(10L, file);
     return ResponseEntity.ok(DocumentResponse.of(document));
   }

@@ -1,24 +1,25 @@
 package ru.malkiev.oauth.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 
-@EnableWebSecurity
+@EnableWebFluxSecurity
 public class SecurityConfig {
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .authorizeRequests(authorizeRequests ->
-            authorizeRequests.anyRequest().authenticated()
+  public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+    return http
+        .authorizeExchange(authorizeRequests -> authorizeRequests
+            .pathMatchers("/login").permitAll()
+            .anyExchange().authenticated()
         )
-        .oauth2Login(withDefaults())
-        .oauth2Client(withDefaults());
-    return http.build();
+        .oauth2Login(Customizer.withDefaults())
+        .oauth2Client(Customizer.withDefaults())
+        .logout(Customizer.withDefaults())
+        .build();
   }
 
 }
