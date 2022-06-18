@@ -1,4 +1,4 @@
-package ru.malkiev.files.service;
+package ru.malkiev.documents.service;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
@@ -11,10 +11,10 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import ru.malkiev.files.entity.Document;
-import ru.malkiev.files.exception.DocumentNotFoundException;
-import ru.malkiev.files.exception.StorageException;
-import ru.malkiev.files.repository.DocumentRepository;
+import ru.malkiev.documents.entity.Document;
+import ru.malkiev.documents.exception.DocumentNotFoundException;
+import ru.malkiev.documents.exception.StorageException;
+import ru.malkiev.documents.repository.DocumentRepository;
 
 @Service
 @AllArgsConstructor

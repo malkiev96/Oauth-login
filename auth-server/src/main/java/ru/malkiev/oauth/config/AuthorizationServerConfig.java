@@ -8,7 +8,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
@@ -39,6 +39,8 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.security.web.SecurityFilterChain;
+import ru.malkiev.oauth.entity.CustomUserDetails;
+import ru.malkiev.oauth.model.CustomUserDetailsMixin;
 
 @Configuration(proxyBeanMethods = false)
 @AllArgsConstructor
@@ -79,7 +81,10 @@ public class AuthorizationServerConfig {
   public OAuth2AuthorizationService authorizationService(
       JdbcTemplate jdbcTemplate,
       RegisteredClientRepository clientRepository) {
-    return new JdbcOAuth2AuthorizationService(jdbcTemplate, clientRepository);
+    JdbcOAuth2AuthorizationService service = new JdbcOAuth2AuthorizationService(jdbcTemplate,
+        clientRepository);
+    service.setAuthorizationRowMapper(new RowMapper(clientRepository));
+    return service;
   }
 
   @Bean
@@ -100,11 +105,22 @@ public class AuthorizationServerConfig {
   public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
     return context -> {
       if (context.getTokenType().getValue().equals("access_token")) {
-        Authentication principal = context.getPrincipal();
-        Set<String> authorities = principal.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .collect(Collectors.toSet());
-        context.getClaims().claim("roles", authorities);
+        Authentication authentication = context.getPrincipal();
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof CustomUserDetails) {
+          CustomUserDetails details = (CustomUserDetails) principal;
+          List<String> authorities = details.getAuthorities().stream()
+              .map(GrantedAuthority::getAuthority)
+              .collect(Collectors.toList());
+          context.getClaims()
+              .claim("id", details.getId())
+              .claim("username", details.getUsername())
+              .claim("firstName", details.getFirstName())
+              .claim("lastname", details.getLastname())
+              .claim("email", details.getEmail())
+              .claim("authorities", authorities);
+        }
       }
     };
   }
@@ -136,6 +152,15 @@ public class AuthorizationServerConfig {
       throw new IllegalStateException(ex);
     }
     return keyPair;
+  }
+
+  static class RowMapper extends JdbcOAuth2AuthorizationService.OAuth2AuthorizationRowMapper {
+
+    RowMapper(RegisteredClientRepository registeredClientRepository) {
+      super(registeredClientRepository);
+      getObjectMapper().addMixIn(CustomUserDetails.class, CustomUserDetailsMixin.class);
+    }
+
   }
 
 }

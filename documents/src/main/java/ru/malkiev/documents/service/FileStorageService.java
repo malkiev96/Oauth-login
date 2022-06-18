@@ -1,4 +1,4 @@
-package ru.malkiev.files.service;
+package ru.malkiev.documents.service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,8 +10,8 @@ import javax.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ru.malkiev.files.config.FileStorageProperties;
-import ru.malkiev.files.exception.StorageException;
+import ru.malkiev.documents.config.FileStorageProperties;
+import ru.malkiev.documents.exception.StorageException;
 
 @Service
 public class FileStorageService {

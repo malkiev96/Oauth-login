@@ -1,4 +1,4 @@
-package ru.malkiev.files.config;
+package ru.malkiev.documents.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

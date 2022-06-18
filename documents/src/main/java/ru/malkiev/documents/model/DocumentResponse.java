@@ -1,8 +1,8 @@
-package ru.malkiev.files.model;
+package ru.malkiev.documents.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.malkiev.files.entity.Document;
+import ru.malkiev.documents.entity.Document;
 
 @Data
 @NoArgsConstructor

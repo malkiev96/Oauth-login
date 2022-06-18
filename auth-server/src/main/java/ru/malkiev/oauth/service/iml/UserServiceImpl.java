@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import ru.malkiev.oauth.dto.UserDto;
+import ru.malkiev.oauth.entity.CustomUserDetails;
 import ru.malkiev.oauth.entity.Role;
 import ru.malkiev.oauth.entity.User;
 import ru.malkiev.oauth.repository.UserRepository;
@@ -43,11 +44,7 @@ public class UserServiceImpl implements UserService {
       user = userRepository.findByUsername(username)
           .orElseThrow(() -> new UsernameNotFoundException(username));
     }
-    return new org.springframework.security.core.userdetails.User(
-        user.getUsername(), user.getPassword(),
-        user.isEnabled(), user.isEnabled(), user.isEnabled(), !user.isLocked(),
-        getAuthorities(user)
-    );
+    return CustomUserDetails.of(user);
   }
 
   @Override

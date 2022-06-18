@@ -1,4 +1,4 @@
-package ru.malkiev.files.entity;
+package ru.malkiev.documents.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

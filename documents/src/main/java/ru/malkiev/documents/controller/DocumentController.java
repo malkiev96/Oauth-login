@@ -1,4 +1,4 @@
-package ru.malkiev.files.controller;
+package ru.malkiev.documents.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import ru.malkiev.files.entity.Document;
-import ru.malkiev.files.model.DocumentResponse;
-import ru.malkiev.files.service.DocumentService;
+import ru.malkiev.documents.entity.Document;
+import ru.malkiev.documents.model.DocumentResponse;
+import ru.malkiev.documents.service.CurrentUser;
+import ru.malkiev.documents.service.DocumentService;
 
 @Slf4j
 @RestController
@@ -22,11 +23,12 @@ import ru.malkiev.files.service.DocumentService;
 @RequestMapping("/documents")
 public class DocumentController {
 
+  private final CurrentUser currentUser;
   private final DocumentService service;
 
   @PostMapping
   public ResponseEntity<DocumentResponse> save(@RequestParam("file") MultipartFile file) {
-    Document document = service.save(10L, file);
+    Document document = service.save(currentUser.getUserId(), file);
     return ResponseEntity.ok(DocumentResponse.of(document));
   }
 

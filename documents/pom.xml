@@ -10,7 +10,7 @@
     <relativePath/>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>files</artifactId>
+  <artifactId>documents</artifactId>
 
   <dependencies>
     <dependency>
