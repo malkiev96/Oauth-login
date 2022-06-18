@@ -1,5 +1,6 @@
 package ru.malkiev.oauth.config;
 
+import javax.servlet.Filter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +15,6 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 import ru.malkiev.oauth.service.UserService;
-
-import javax.servlet.Filter;
 
 @Configuration
 @EnableAuthorizationServer
@@ -55,9 +54,10 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         clients.inMemory()
                 .withClient("client")
                 .secret(passwordEncoder.encode("secret"))
-                .authorizedGrantTypes("authorization_code")
+                .authorizedGrantTypes("authorization_code", "refresh_token")
                 .autoApprove(true)
                 .scopes("profile")
+                .accessTokenValiditySeconds(10)
                 .redirectUris("http://localhost:8080/login/oauth2/code/sso");
     }
 }

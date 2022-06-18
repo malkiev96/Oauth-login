@@ -1,23 +1,41 @@
 package ru.malkiev.oauth.config;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 
-@Configuration
-@Order(1)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableWebFluxSecurity
+public class SecurityConfig {
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
-				.authorizeRequests()
-				.antMatchers("/login/**").permitAll()
-				.anyRequest().authenticated()
-				.and()
-				.oauth2Login(Customizer.withDefaults())
-				.logout(Customizer.withDefaults());
-	}
+  @Bean
+  public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+    return http
+        .securityMatcher(
+            allRequestsBut("/public/**")
+        )
+        .authorizeExchange(authorizeRequests -> authorizeRequests
+            .pathMatchers("/login").permitAll()
+            .anyExchange().authenticated()
+        )
+        .oauth2Login(Customizer.withDefaults())
+        .logout(Customizer.withDefaults())
+        .build();
+  }
+
+  private static ServerWebExchangeMatcher allRequestsBut(String... paths) {
+    List<ServerWebExchangeMatcher> matchers = Arrays.stream(paths)
+        .map(PathPatternParserServerWebExchangeMatcher::new)
+        .collect(Collectors.toList());
+    return new NegatedServerWebExchangeMatcher(new OrServerWebExchangeMatcher(matchers));
+  }
+
 }

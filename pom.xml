@@ -20,6 +20,7 @@
         <module>resource-server</module>
         <module>client-app</module>
         <module>auth-server</module>
+      <module>public-server</module>
     </modules>
 
     <properties>
