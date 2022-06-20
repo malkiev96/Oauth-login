@@ -20,6 +20,10 @@ spring:
           uri: http://127.0.0.1:8081
           predicates:
             - Path=/documents/**
+        - id: users
+          uri: http://127.0.0.1:8082
+          predicates:
+            - Path=/users/**
   main:
     allow-bean-definition-overriding: true
   security:
