@@ -1,6 +1,7 @@
 package ru.malkiev.oauth.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import ru.malkiev.oauth.model.AuthoritiesModel;
 import ru.malkiev.oauth.model.UserModel;
 import ru.malkiev.oauth.repository.UserRepository;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 public class UserController {
@@ -27,6 +29,7 @@ public class UserController {
     @GetMapping("/user/me")
     public ResponseEntity<AuthoritiesModel> user() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Get userInfo {}", authentication.getName());
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             User user = (User) authentication.getPrincipal();
             return ResponseEntity.ok(new AuthoritiesModel(user));

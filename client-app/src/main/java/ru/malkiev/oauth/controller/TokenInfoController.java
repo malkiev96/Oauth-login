@@ -2,15 +2,31 @@ package ru.malkiev.oauth.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.WebSession;
+import reactor.core.publisher.Mono;
 
 @RestController
 public class TokenInfoController {
+
+  @Autowired
+  private WebClient webClient;
+
+  @GetMapping("/test")
+  public Mono<String> test() {
+    return webClient
+        .get()
+        .uri("http://localhost:8082/hello")
+        .retrieve()
+        .bodyToMono(String.class);
+  }
 
   @GetMapping("/tokenInfo")
   public Map<String, String> getTokenInfo(
@@ -33,6 +49,12 @@ public class TokenInfoController {
       @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client
   ) {
     return client;
+  }
+
+
+  @GetMapping("/")
+  public Mono<String> index(WebSession session) {
+    return Mono.just(session.getId());
   }
 
 }
