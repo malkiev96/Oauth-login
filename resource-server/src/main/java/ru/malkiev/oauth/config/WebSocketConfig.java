@@ -28,7 +28,7 @@ public class WebSocketConfig extends AbstractSecurityWebSocketMessageBrokerConfi
         .setHandshakeHandler(new DefaultHandshakeHandler())
         .withSockJS()
         .setInterceptors(new HttpSessionHandshakeInterceptor())
-        .setWebSocketEnabled(false);
+        .setWebSocketEnabled(true);
   }
 
 
