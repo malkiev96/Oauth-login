@@ -40,7 +40,8 @@ spring:
             authorizationUri: http://localhost:8081/auth/oauth/authorize
             userInfoUri: http://localhost:8081/auth/user/me
             userNameAttribute: name
-
+  thymeleaf:
+    cache: false
 logging:
   level:
     root: INFO

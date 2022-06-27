@@ -57,7 +57,6 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
                 .authorizedGrantTypes("authorization_code", "refresh_token")
                 .autoApprove(true)
                 .scopes("profile")
-                .accessTokenValiditySeconds(10)
                 .redirectUris("http://localhost:8080/login/oauth2/code/sso");
     }
 }
