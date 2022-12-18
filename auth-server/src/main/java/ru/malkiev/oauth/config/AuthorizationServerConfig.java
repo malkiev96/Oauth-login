@@ -28,6 +28,8 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import ru.malkiev.oauth.model.CustomUserDetails;
+import ru.malkiev.oauth.model.CustomUserDetailsMixin;
 
 @Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfig {
@@ -82,7 +84,9 @@ public class AuthorizationServerConfig {
   @Bean
   public OAuth2AuthorizationService authorizationService(
       JdbcTemplate jdbcTemplate, RegisteredClientRepository clientRepository) {
-    return new JdbcOAuth2AuthorizationService(jdbcTemplate, clientRepository);
+    var service = new JdbcOAuth2AuthorizationService(jdbcTemplate, clientRepository);
+    service.setAuthorizationRowMapper(new CustomRowMapper(clientRepository));
+    return service;
   }
 
   @Bean
@@ -97,6 +101,15 @@ public class AuthorizationServerConfig {
     return AuthorizationServerSettings.builder()
         .issuer(issuer)
         .build();
+  }
+
+  static class CustomRowMapper extends JdbcOAuth2AuthorizationService.OAuth2AuthorizationRowMapper {
+
+    public CustomRowMapper(RegisteredClientRepository clientRepository) {
+      super(clientRepository);
+      getObjectMapper().addMixIn(CustomUserDetails.class, CustomUserDetailsMixin.class);
+    }
+
   }
 
 }

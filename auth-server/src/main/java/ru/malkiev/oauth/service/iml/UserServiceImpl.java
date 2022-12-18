@@ -2,11 +2,9 @@ package ru.malkiev.oauth.service.iml;
 
 import static java.lang.String.format;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,8 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import ru.malkiev.oauth.dto.UserDto;
-import ru.malkiev.oauth.entity.Role;
 import ru.malkiev.oauth.entity.User;
+import ru.malkiev.oauth.model.CustomUserDetails;
 import ru.malkiev.oauth.repository.UserRepository;
 import ru.malkiev.oauth.service.RoleService;
 import ru.malkiev.oauth.service.UserService;
@@ -40,20 +38,7 @@ public class UserServiceImpl implements UserService {
       user = userRepository.findByUsername(username)
           .orElseThrow(() -> new UsernameNotFoundException(username));
     }
-    List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-        .map(Role::getCode)
-        .map(SimpleGrantedAuthority::new)
-        .toList();
-    boolean enabled = user.isEnabled();
-    return org.springframework.security.core.userdetails.User
-        .withUsername(user.getUsername())
-        .password(user.getPassword())
-        .authorities(authorities)
-        .accountExpired(!enabled)
-        .accountLocked(user.isLocked())
-        .credentialsExpired(!enabled)
-        .disabled(!enabled)
-        .build();
+    return new CustomUserDetails(user);
   }
 
   @Override
