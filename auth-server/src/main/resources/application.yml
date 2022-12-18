@@ -4,17 +4,16 @@ server:
 project:
   issuer: http://auth-server:9000
 spring:
-  h2:
-    console:
-      enabled: true
   datasource:
-    url: jdbc:h2:mem:mydb
-    username: sa
-    password: password
-    driverClassName: org.h2.Driver
+    url: jdbc:postgresql://localhost:5432/oauth
+    username: postgres
+    password: root
+    driverClassName: org.postgresql.Driver
   jpa:
     show-sql: true
-    defer-datasource-initialization: true # init data.sql
+    defer-datasource-initialization: false # init data.sql
+    hibernate:
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true

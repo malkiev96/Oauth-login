@@ -1,13 +1,6 @@
 server:
   port: 8080
 
-logging:
-  level:
-    root: INFO
-    org.springframework.web: INFO
-    org.springframework.security: INFO
-    org.springframework.security.oauth2: INFO
-
 spring:
   cloud:
     gateway:
@@ -16,28 +9,29 @@ spring:
         - StripPrefix=1
         - TokenRelay=
       routes:
-        - id: documents
+        - id: messages
           uri: http://127.0.0.1:8081
           predicates:
-            - Path=/documents/**
-        - id: users
-          uri: http://127.0.0.1:8082
-          predicates:
-            - Path=/users/**
-  main:
-    allow-bean-definition-overriding: true
+            - Path=/messages/**
   security:
     oauth2:
       client:
         registration:
-          auth-client-oidc:
-            provider: spring
+          gateway:
+            provider: my-provider
             client-id: auth-client
             client-secret: auth-secret
             authorization-grant-type: authorization_code
             redirect-uri: "http://127.0.0.1:8080/login/oauth2/code/{registrationId}"
-            scope: openid
-            client-name: auth-client-oidc
+            scope:
+              - openid
+              - profile
         provider:
-          spring:
+          my-provider:
             issuer-uri: http://auth-server:9000
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO

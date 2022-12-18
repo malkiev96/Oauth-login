@@ -2,13 +2,10 @@ package ru.malkiev.oauth.service.iml;
 
 import static java.lang.String.format;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import ru.malkiev.oauth.dto.UserDto;
-import ru.malkiev.oauth.entity.CustomUserDetails;
 import ru.malkiev.oauth.entity.Role;
 import ru.malkiev.oauth.entity.User;
 import ru.malkiev.oauth.repository.UserRepository;
@@ -44,7 +40,20 @@ public class UserServiceImpl implements UserService {
       user = userRepository.findByUsername(username)
           .orElseThrow(() -> new UsernameNotFoundException(username));
     }
-    return CustomUserDetails.of(user);
+    List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+        .map(Role::getCode)
+        .map(SimpleGrantedAuthority::new)
+        .toList();
+    boolean enabled = user.isEnabled();
+    return org.springframework.security.core.userdetails.User
+        .withUsername(user.getUsername())
+        .password(user.getPassword())
+        .authorities(authorities)
+        .accountExpired(!enabled)
+        .accountLocked(user.isLocked())
+        .credentialsExpired(!enabled)
+        .disabled(!enabled)
+        .build();
   }
 
   @Override
@@ -52,11 +61,11 @@ public class UserServiceImpl implements UserService {
     User user = new User();
 
     String username = dto.getUsername();
-    boolean usernameNotPresent = !userRepository.findByUsername(username).isPresent();
+    boolean usernameNotPresent = userRepository.findByUsername(username).isEmpty();
     Assert.isTrue(usernameNotPresent, format("Пользователь %s уже зарегистрирован", username));
 
     String email = dto.getEmail();
-    boolean emailNotPresent = !userRepository.findByEmail(email).isPresent();
+    boolean emailNotPresent = userRepository.findByEmail(email).isEmpty();
     Assert.isTrue(emailNotPresent, format("Email %s уже зарегистрирован в системе", email));
 
     user.setUsername(username);
@@ -75,14 +84,6 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserDetails updatePassword(UserDetails userDetails, String s) {
     throw new UnsupportedOperationException("Not implemented");
-  }
-
-  private Collection<? extends GrantedAuthority> getAuthorities(User user) {
-    List<GrantedAuthority> authorities = new ArrayList<>();
-    for (Role role : user.getRoles()) {
-      authorities.add(new SimpleGrantedAuthority(role.getCode()));
-    }
-    return authorities;
   }
 
 }
