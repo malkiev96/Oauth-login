@@ -1,85 +1,70 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" data-bs-theme="auto">
 <head>
+  <script src="/static/js/color-modes.js"></script>
   <meta charset="UTF-8">
   <title th:text="${title}"></title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+  <link href="/static/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/style/sign.css" rel="stylesheet">
 </head>
 <body>
 
-<section style="background-color: #9A616D;">
-  <div class="container py-5 h-100">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col col-xl-6">
-        <div class="card" style="border-radius: 1rem;">
-          <div class="row d-flex align-items-center">
-            <div class="card-body p-4 p-lg-5 text-black">
+<main class="form-signup w-100 m-auto">
 
-              <form name="login" th:action="@{/signup}" method="post">
+  <form name="login" th:action="@{/signup}" method="post">
 
-                <div class="h3 fw-bold mb-4" style="letter-spacing: 1px;">Регистрация</div>
+    <div class="h3 mb-3 fw-normal">Регистрация</div>
 
-                <div th:if="${(param.error !=null) and (param.error[0] == 'exists')}"
-                     class="alert alert-danger">
-                  Имя пользователя или Email уже существуют в системе
-                </div>
-                <div th:if="${(param.error !=null) and (param.error[0] == 'unexpected')}"
-                     class="alert alert-danger">
-                  Произошла непредвиденная ошибка. Попробуйте позже
-                </div>
-
-                <div class="form-outline mb-3">
-                  <input required minlength="3" maxlength="32"
-                         type="text" id="username" name="username"
-                         class="form-control form-control-md"/>
-                  <label class="form-label" for="username">Имя пользователя (логин)</label>
-                </div>
-
-                <div class="form-outline mb-3">
-                  <input required maxlength="128" type="text" id="firstname" name="firstname"
-                         class="form-control form-control-md"/>
-                  <label class="form-label" for="firstname">Имя</label>
-                </div>
-
-                <div class="form-outline mb-3">
-                  <input required maxlength="128" type="text" id="lastname" name="lastname"
-                         class="form-control form-control-md"/>
-                  <label class="form-label" for="lastname">Фамилия</label>
-                </div>
-
-                <div class="form-outline mb-3">
-                  <input required type="email" id="email" name="email"
-                         class="form-control form-control-md"/>
-                  <label class="form-label" for="email">Email</label>
-                </div>
-
-                <div class="form-outline mb-3">
-                  <input required minlength="6" maxlength="32" type="password" id="password"
-                         name="password"
-                         class="form-control form-control-md"/>
-                  <label class="form-label" for="password">Пароль</label>
-                </div>
-
-                <input hidden type="text" id="redirectUri" name="redirectUri"
-                       th:value="${param.redirectUri}">
-
-                <div class="pt-1 mb-4">
-                  <button class="btn btn-dark btn-lg btn-block" type="submit">Регистрация</button>
-                </div>
-
-                <p class="mb-5 pb-lg-2" style="color: #393f81;">Уже зарегистрированы?
-                  <a href="/login" style="color: #393f81;">Войти</a>
-                </p>
-              </form>
-
-            </div>
-          </div>
-        </div>
-      </div>
+    <div th:if="${(param.error !=null) and (param.error[0] == 'exists')}"
+         class="alert alert-danger">
+      Имя пользователя или Email уже существуют в системе
     </div>
-  </div>
-</section>
+    <div th:if="${(param.error !=null) and (param.error[0] == 'unexpected')}"
+         class="alert alert-danger">
+      Произошла непредвиденная ошибка. Попробуйте позже
+    </div>
 
+    <div class="form-floating">
+      <input required minlength="3" maxlength="32"
+             type="text" id="username" name="username"
+             class="form-control form-control-md"/>
+      <label class="form-label" for="username">Имя пользователя (логин)</label>
+    </div>
+
+    <div class="form-floating">
+      <input required maxlength="128" type="text" id="firstname" name="firstname"
+             class="form-control form-control-md"/>
+      <label class="form-label" for="firstname">Имя</label>
+    </div>
+
+    <div class="form-floating">
+      <input required maxlength="128" type="text" id="lastname" name="lastname"
+             class="form-control form-control-md"/>
+      <label class="form-label" for="lastname">Фамилия</label>
+    </div>
+
+    <div class="form-floating">
+      <input required type="email" id="email" name="email"
+             class="form-control form-control-md"/>
+      <label class="form-label" for="email">Email</label>
+    </div>
+
+    <div class="form-floating">
+      <input required minlength="6" maxlength="32" type="password" id="password"
+             name="password"
+             class="form-control form-control-md"/>
+      <label class="form-label" for="password">Пароль</label>
+    </div>
+
+    <button class="btn btn-primary w-100 py-2 mb-4" type="submit">Регистрация</button>
+
+    <p class="mb-5 pb-lg-2">Уже зарегистрированы?
+      <a href="/login">Войти</a>
+    </p>
+  </form>
+
+</main>
+
+<script src="/static/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

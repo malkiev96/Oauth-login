@@ -17,7 +17,7 @@ import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
-import ru.malkiev.oauth.model.CustomUserDetails;
+import ru.malkiev.oauth.domain.AppUserDetails;
 
 @Configuration
 public class JwkConfig {
@@ -28,14 +28,15 @@ public class JwkConfig {
       if (context.getTokenType().equals(OAuth2TokenType.ACCESS_TOKEN)) {
         Authentication authentication = context.getPrincipal();
         if (authentication != null) {
-          if (authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
-            context.getClaims()
+          if (authentication.getPrincipal() instanceof AppUserDetails userDetails) {
+            context
+                .getClaims()
                 .claim("id", userDetails.getId().toString())
                 .claim("username", userDetails.getUsername())
                 .claim("firstName", userDetails.getFirstName())
                 .claim("lastName", userDetails.getLastName())
                 .claim("email", userDetails.getEmail())
-                .claim("authorities", userDetails.getAuthorities());
+                .claim("roles", userDetails.getRoles());
           }
         }
       }

@@ -1,6 +1,10 @@
 .idea
-auth-server/target
-client-app/target
-resource-server/target
-target
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
 *.iml
+*.ipr

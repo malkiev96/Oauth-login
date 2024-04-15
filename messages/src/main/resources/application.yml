@@ -5,7 +5,13 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://auth-server:9000
+          issuer-uri: ${AUTH_SERVER_URL}
+  application:
+    name: messages
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL}
 logging:
   level:
     root: INFO

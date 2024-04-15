@@ -1,35 +1,28 @@
 package ru.malkiev.oauth.config;
 
-import static java.util.Optional.ofNullable;
-
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
-import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import ru.malkiev.oauth.model.CustomUserDetails;
-import ru.malkiev.oauth.model.CustomUserDetailsMixin;
+import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import ru.malkiev.oauth.config.jackson.AppUserDetailsMixin;
+import ru.malkiev.oauth.domain.AppUserDetails;
 
 @Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfig {
@@ -39,46 +32,24 @@ public class AuthorizationServerConfig {
   @Bean
   @Order(Ordered.HIGHEST_PRECEDENCE)
   public SecurityFilterChain authServerSecurityFilterChain(HttpSecurity http) throws Exception {
-    var authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
-    authorizationServerConfigurer
-        .authorizationEndpoint(configurer -> configurer.consentPage(CUSTOM_CONSENT_PAGE_URI))
-        .oidc(Customizer.withDefaults());
-    var endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
+    OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 
-    http
-        .securityMatcher(endpointsMatcher)
-        .authorizeHttpRequests(authorize ->
-            authorize.anyRequest().authenticated()
-        )
-        .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
-        .exceptionHandling(exceptions ->
-            exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
-        )
-        .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
-        .apply(authorizationServerConfigurer);
+    http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+        .authorizationEndpoint(endpoint -> endpoint.consentPage(CUSTOM_CONSENT_PAGE_URI))
+        .oidc(Customizer.withDefaults());
+    http.exceptionHandling(
+            exceptions ->
+                exceptions.defaultAuthenticationEntryPointFor(
+                    new LoginUrlAuthenticationEntryPoint("/login"),
+                    new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
+        .oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults()));
+
     return http.build();
   }
 
   @Bean
-  public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate,
-      PasswordEncoder passwordEncoder) {
-    var repository = new JdbcRegisteredClientRepository(jdbcTemplate);
-    var client = ofNullable(repository.findByClientId("auth-client"))
-        .orElseGet(() -> RegisteredClient.withId(UUID.randomUUID().toString())
-            .clientId("auth-client")
-            .clientSecret(passwordEncoder.encode("auth-secret"))
-            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/gateway")
-            .redirectUri("http://127.0.0.1:8080/authorized")
-            .scope(OidcScopes.OPENID)
-            .scope(OidcScopes.PROFILE)
-            .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-            .build());
-    repository.save(client);
-    return repository;
+  public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
+    return new JdbcRegisteredClientRepository(jdbcTemplate);
   }
 
   @Bean
@@ -107,7 +78,7 @@ public class AuthorizationServerConfig {
 
     public CustomRowMapper(RegisteredClientRepository clientRepository) {
       super(clientRepository);
-      getObjectMapper().addMixIn(CustomUserDetails.class, CustomUserDetailsMixin.class);
+      getObjectMapper().addMixIn(AppUserDetails.class, AppUserDetailsMixin.class);
     }
 
   }
