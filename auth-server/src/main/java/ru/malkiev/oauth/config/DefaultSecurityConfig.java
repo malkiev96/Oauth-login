@@ -16,7 +16,7 @@ public class DefaultSecurityConfig {
     return http.authorizeHttpRequests(
             requests ->
                 requests
-                    .requestMatchers("signup", "/static/**")
+                    .requestMatchers("signup", "/static/**", "/actuator/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

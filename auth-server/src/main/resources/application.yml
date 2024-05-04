@@ -16,7 +16,11 @@ spring:
     properties:
       hibernate:
         format_sql: ${SHOW_SQL}
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
 logging:
   level:
     root: INFO
